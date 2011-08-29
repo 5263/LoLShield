@@ -24,6 +24,9 @@ namespace LedSign
     extern void Clear(int set=0);
     extern void Horizontal(int y, int set=0);
     extern void Vertical(int x, int set=0);
+    extern uint8_t Get(uint8_t x, uint8_t y);
+    extern void ScrollLeft(uint8_t x=1, uint8_t set=0);
+    extern void ScrollUp(uint8_t y=1, uint8_t set=0);
 };
 
 #endif

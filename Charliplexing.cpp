@@ -12,6 +12,7 @@
     2010-01-01 - V0.1 adding misc utility functions 
       (Clear, Vertical,  Horizontal) comment are Doxygen complaints now
     2010-05-27 - V0.2 add double-buffer mode
+    2011-08-29 - V0.3 lamer added experimental scrolling
 
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public
@@ -244,6 +245,27 @@ void LedSign::Set(uint8_t x, uint8_t y, uint8_t c)
     }
 }
 
+
+/* -----------------------------------------------------------------  */
+/** Get : Get the state of a single led. All the position #for char in
+ * frameString: calculations are done here, so we don't need to do in the
+ * interrupt code
+ */
+uint8_t LedSign::Get(uint8_t x, uint8_t y)
+{
+    uint8_t pin_high = ledMap[x+y*14].high;
+    uint8_t pin_low  = ledMap[x+y*14].low;
+    // pin_low is directly the address in the led array (minus 2 because the 
+    // first two bytes are used for RS232 communication), but
+    // as it is a two byte array we need to check pin_high also.
+    // If pin_high is bigger than 8 address has to be increased by one
+
+    uint8_t bufferNum = (pin_low-2)*2 + (pin_high / 8) + ((pin_high > 7)?24:0);
+    //uint8_t work = _BV(pin_high & 0x07);
+    return workBuffer[bufferNum] >> (pin_high & 0x07);
+}
+
+
 /* Set the overall brightness of the screen
  * @param brightness LED brightness, from 0 (off) to 127 (full on)
  */
@@ -260,6 +282,48 @@ void LedSign::SetBrightness(uint8_t brightness)
     // Then update the registers
     timeOn = newTimeOn;
     timeOff = newTimeOff;
+}
+
+
+/* -----------------------------------------------------------------  */
+/** Scroll horizontally to the left
+ * @param x is the amount of pixel that should be scolled
+ * 0 would be useless, so are values >13
+ * @param set: fill leds with 1 (on) resp. 0 (off, default)
+ */
+void LedSign::ScrollLeft(uint8_t x, uint8_t set)
+{
+    if (x<=14)
+    {
+        for(uint8_t x1=0;x1+x<14;x++)
+            for(uint8_t y=0;y<9;y++)
+                Set(x,y,Get(x1+x,y));
+        for(uint8_t x1=14-x;x<14;x++)
+            for(uint8_t y=0;y<9;y++)
+                Set(x,y,set);
+    }
+    else Clear(set);
+}
+
+
+/* -----------------------------------------------------------------  */
+/** Scroll vertically to upwards
+ * @param x is the amount of pixel that should be scolled
+ * 0 would be useless, so are values >8
+ * @param set: fill leds with 1 (on) resp. 0 (off, default)
+ */
+void LedSign::ScrollUp(uint8_t y, uint8_t set)
+{
+    if (y<9)
+    {
+        for(uint8_t y1=0;y1+y<9;y++)
+            for(uint8_t x=0;x<14;x++)
+                Set(x,y,Get(x,y1+y));
+        for(uint8_t y1=9-y;y<9;y++)
+            for(uint8_t x=0;x<14;x++)
+                Set(x,y,set);
+    }
+    else Clear(set);
 }
 
 
