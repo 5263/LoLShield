@@ -262,7 +262,7 @@ uint8_t LedSign::Get(uint8_t x, uint8_t y)
 
     uint8_t bufferNum = (pin_low-2)*2 + (pin_high / 8) + ((pin_high > 7)?24:0);
     //uint8_t work = _BV(pin_high & 0x07);
-    return workBuffer[bufferNum] >> (pin_high & 0x07);
+    return (workBuffer[bufferNum] >> (pin_high & 0x07)) & 1;
 }
 
 
