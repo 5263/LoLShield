@@ -293,16 +293,19 @@ void LedSign::SetBrightness(uint8_t brightness)
  */
 void LedSign::ScrollLeft(uint8_t x, uint8_t set)
 {
-    if (x<=14)
+    if (x>0)
     {
-        for(uint8_t x1=0;x1+x<14;x++)
-            for(uint8_t y=0;y<9;y++)
-                Set(x,y,Get(x1+x,y));
-        for(uint8_t x1=14-x;x<14;x++)
-            for(uint8_t y=0;y<9;y++)
-                Set(x,y,set);
+        if (x<14)
+        {
+            for(uint8_t x1=0;x1+x<14;x1++)
+                for(uint8_t y=0;y<9;y++)
+                    Set(x1,y,Get(x1+x,y));
+            for(uint8_t x1=14-x;x1<14;x1++)
+                for(uint8_t y=0;y<9;y++)
+                    Set(x1,y,set);
+        }
+        else Clear(set);
     }
-    else Clear(set);
 }
 
 
@@ -314,16 +317,19 @@ void LedSign::ScrollLeft(uint8_t x, uint8_t set)
  */
 void LedSign::ScrollUp(uint8_t y, uint8_t set)
 {
-    if (y<9)
+    if (x>0)
     {
-        for(uint8_t y1=0;y1+y<9;y++)
-            for(uint8_t x=0;x<14;x++)
-                Set(x,y,Get(x,y1+y));
-        for(uint8_t y1=9-y;y<9;y++)
-            for(uint8_t x=0;x<14;x++)
-                Set(x,y,set);
+        if (y<9)
+        {
+            for(uint8_t y1=0;y1+y<9;y1++)
+                for(uint8_t x=0;x<14;x++)
+                    Set(x,y1,Get(x,y1+y));
+            for(uint8_t y1=9-y;y1<9;y1++)
+                for(uint8_t x=0;x<14;x++)
+                    Set(x,y,set);
+        }
+        else Clear(set);
     }
-    else Clear(set);
 }
 
 
